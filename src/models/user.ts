@@ -7,6 +7,8 @@ export type UserType = {
     password: string;
     firstName: string;
     lastName: string;
+    resetToken?: string; // Add this line
+  resetTokenExpiration?: number; // Add this line
 };
 
 const userSchema = new mongoose.Schema({
@@ -14,6 +16,9 @@ const userSchema = new mongoose.Schema({
    password: { type: String, required: true },
    firstName: { type: String, required: true },
    lastName: { type: String, required: true },
+
+   resetToken: { type: String }, // Add this line
+   resetTokenExpiration: { type: Number }, // Add this line
 })
 
 userSchema.pre("save", async function (next) {
