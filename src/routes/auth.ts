@@ -28,7 +28,6 @@ router.post(
     try {
       const user = await User.findOne({ email });
 
-      console.log(user);
       if (!user) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
@@ -97,8 +96,8 @@ router.post(
         host: "smtp.ethereal.email",
         port: 587,
         auth: {
-          user: "edwin.maggio10@ethereal.email",
-          pass: "Ndxm8Ma3SfvJmf2U1D",
+          user: "isac.jakubowski13@ethereal.email",
+          pass: "prCM3U5P1qQTmCsUEk",
         },
       });
 
@@ -130,9 +129,6 @@ router.post("/reset-password/:token", async (req: Request, res: Response) => {
       resetToken: token,
       resetTokenExpiration: { $gt: Date.now() },
     });
-
-    console.log(token);
-    console.log(password);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
