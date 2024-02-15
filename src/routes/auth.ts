@@ -9,15 +9,17 @@ import verifyToken from "../../middleware/auth";
 
 const router = express.Router();
 
+// Login route with validation
 router.post(
   "/login",
   [
     check("email", "Email is required").isEmail(),
-    check("password", "password with 6 or more characters required").isLength({
+    check("password", "Password with 6 or more characters required").isLength({
       min: 6,
     }),
   ],
   async (req: Request, res: Response) => {
+    // Validate request parameters
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() });
@@ -26,17 +28,20 @@ router.post(
     const { email, password } = req.body;
 
     try {
+      // Find user by email
       const user = await User.findOne({ email });
 
       if (!user) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
+      // Check password validity
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
+      // Create and send a JWT token
       const token = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET_KEY as string,
@@ -46,21 +51,23 @@ router.post(
       res.cookie("auth_token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 86400000,
+        maxAge: 86400000, // 1 day in milliseconds
       });
 
       res.status(200).json({ userId: user._id });
     } catch (error) {
-      console.log(error);
+      console.error(error);
       res.status(500).json({ message: "Something went wrong..." });
     }
   }
 );
 
+// Validate token route
 router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
   res.status(200).send({ userId: req.userId });
 });
 
+// Logout route
 router.post("/logout", (req: Request, res: Response) => {
   res.cookie("auth_token", "", {
     expires: new Date(0),
@@ -68,10 +75,12 @@ router.post("/logout", (req: Request, res: Response) => {
   res.send();
 });
 
+// Forgot password route with validation
 router.post(
   "/forgot-password",
   [check("email", "Email is required").isEmail()],
   async (req: Request, res: Response) => {
+    // Validate request parameters
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() });
@@ -80,6 +89,7 @@ router.post(
     const { email } = req.body;
 
     try {
+      // Find user by email
       const user = await User.findOne({ email });
 
       if (!user) {
@@ -92,6 +102,7 @@ router.post(
       user.resetTokenExpiration = Date.now() + 3600000; // Token expires in 1 hour
       await user.save();
 
+      // Use nodemailer to send a password reset email
       const transporter = nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,
@@ -119,12 +130,13 @@ router.post(
   }
 );
 
-// New route for handling password reset with token
+// Password reset route with token
 router.post("/reset-password/:token", async (req: Request, res: Response) => {
   const { token } = req.params;
   const { password } = req.body;
 
   try {
+    // Find user by reset token and check if it's still valid
     const user = await User.findOne({
       resetToken: token,
       resetTokenExpiration: { $gt: Date.now() },
