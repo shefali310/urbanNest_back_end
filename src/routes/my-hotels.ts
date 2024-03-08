@@ -156,4 +156,15 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
+
+//  fetching hotels for the carousel
+router.get('/api/carousel-hotels', async (req: Request, res: Response) => {
+  try {
+    const hotels = await Hotel.find();
+    res.json(hotels);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching hotels for carousel!' });
+  }
+});
+
 export default router;
