@@ -145,7 +145,10 @@ router.delete("/:id", verifyToken, async (req, res) => {
   const id = req.params.id.toString();
 
   try {
-    const deletedHotel = await Hotel.findOneAndDelete({ _id: id, userId: req.userId });
+    const deletedHotel = await Hotel.findOneAndDelete({
+      _id: id,
+      userId: req.userId,
+    });
     if (!deletedHotel) {
       return res.status(404).json({ message: "Hotel not found" });
     }
@@ -153,17 +156,6 @@ router.delete("/:id", verifyToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error deleting hotel" });
-  }
-});
-
-
-//  fetching hotels for the carousel
-router.get('/api/carousel-hotels', async (req: Request, res: Response) => {
-  try {
-    const hotels = await Hotel.find();
-    res.json(hotels);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching hotels for carousel!' });
   }
 });
 

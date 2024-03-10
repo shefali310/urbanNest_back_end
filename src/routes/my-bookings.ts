@@ -5,18 +5,23 @@ import { HotelType } from "../../src/models/hotel";
 
 const router = express.Router();
 
-//   /api/my-bookings
+// /api/my-bookings
+
+// Fetch bookings associated with the authenticated user
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
+    
     const hotels = await Hotel.find({
       bookings: { $elemMatch: { userId: req.userId } },
     });
 
+    // Map over the hotels and filter bookings for the authenticated user
     const results = hotels.map((hotel) => {
       const userBookings = hotel.bookings.filter(
         (booking) => booking.userId === req.userId
       );
 
+      // Create a new HotelType object with filtered user bookings
       const hotelWithUserBookings: HotelType = {
         ...hotel.toObject(),
         bookings: userBookings,
@@ -25,6 +30,7 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
       return hotelWithUserBookings;
     });
 
+    
     res.status(200).send(results);
   } catch (error) {
     console.log(error);

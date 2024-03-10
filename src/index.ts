@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 import { v2 as cloudinary } from "cloudinary";
 import hotelRoutes from "./routes/hotels";
 import bookingRoutes from "./routes/my-bookings";
-import carouselRoutes from "./routes/my-hotels";
+
 
 // Cloudinary setup
 cloudinary.config({
@@ -58,5 +58,5 @@ app.use("/api/users", userRoutes);
 app.use("/api/my-hotels", myHotelRoutes);
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/my-bookings", bookingRoutes);
-app.use("/api/carousel-hotels", carouselRoutes);
+
 
