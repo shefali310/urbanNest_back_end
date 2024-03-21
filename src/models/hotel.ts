@@ -16,6 +16,7 @@ export type HotelType = {
   imageUrls: string[];
   lastUpdated: Date;
   bookings: BookingType[];
+  room: string;
 };
 
 export type HotelSearchResponse = {
@@ -38,6 +39,7 @@ export type BookingType = {
   checkIn: Date;
   checkOut: Date;
   totalCost: number;
+  room: string;
 };
 
 export type PaymentIntentResponse = {
@@ -45,6 +47,8 @@ export type PaymentIntentResponse = {
   clientSecret: string;
   totalCost: number;
 };
+
+
 
 const bookingSchema = new mongoose.Schema<BookingType>({
   firstName: { type: String, required: true },
@@ -56,6 +60,7 @@ const bookingSchema = new mongoose.Schema<BookingType>({
   checkOut: { type: Date, required: true },
   userId: { type: String, required: true },
   totalCost: { type: Number, required: true },
+  room: { type: String, required: true },
 });
 
 const hotelSchema = new mongoose.Schema<HotelType>({
@@ -73,6 +78,8 @@ const hotelSchema = new mongoose.Schema<HotelType>({
   imageUrls: [{ type: String, required: true }],
   lastUpdated: { type: Date, required: true },
   bookings: [bookingSchema],
+  room: { type: String, required: true },
+ 
 });
 
 const Hotel = mongoose.model<HotelType>("Hotel", hotelSchema);
