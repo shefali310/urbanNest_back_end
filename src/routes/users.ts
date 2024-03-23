@@ -76,4 +76,21 @@ router.get("/me", verifyToken, async (req: Request, res: Response) => {
   }
 });
 
+// GET user profile information
+router.get("/profile/:userId", async (req, res) => {
+  const { userId } = req.params;
+  try {
+    try {
+      // Fetch user data
+      const user = await User.findById(userId);
+      res.status(200).json({ user, status: 200 });
+    } catch (err) {
+      console.error(err);
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 export default router;
