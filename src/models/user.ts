@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { HotelType } from "./hotel";
 
 // Define the shape of the User document in MongoDB
 export type UserType = {
@@ -10,6 +11,8 @@ export type UserType = {
   lastName: string;
   resetToken?: string;
   resetTokenExpiration?: number;
+  role: "admin" | "user";
+  hotels: HotelType[];
 };
 
 // Define the schema for the User model
@@ -20,6 +23,8 @@ const userSchema = new mongoose.Schema({
   lastName: { type: String, required: true },
   resetToken: { type: String },
   resetTokenExpiration: { type: Number },
+  role: { type: String, enum: ["admin", "user"], default: "user" },
+  hotels: [{ type: mongoose.Schema.Types.ObjectId, ref: "Hotel" }],
 });
 
 // Middleware to hash the password before saving it to the database
