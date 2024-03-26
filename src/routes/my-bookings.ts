@@ -10,6 +10,7 @@ const router = express.Router();
 // Fetch bookings associated with the authenticated user
 router.get("/", verifyToken, async (req: Request, res: Response) => {
   try {
+    
     const hotels = await Hotel.find({
       bookings: { $elemMatch: { userId: req.userId } },
     });
@@ -29,6 +30,7 @@ router.get("/", verifyToken, async (req: Request, res: Response) => {
       return hotelWithUserBookings;
     });
 
+    
     res.status(200).send(results);
   } catch (error) {
     console.log(error);

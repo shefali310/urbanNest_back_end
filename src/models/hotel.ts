@@ -73,7 +73,15 @@ const hotelSchema = new mongoose.Schema<HotelType>({
   imageUrls: [{ type: String, required: true }],
   lastUpdated: { type: Date, required: true },
   bookings: [bookingSchema],
+
+  // userId: {
+  //   type: String,
+  //   ref: 'User',
+  //   required: true,
+  // },
 });
 
-const Hotel = mongoose.model<HotelType>("Hotel", hotelSchema);
+export const Hotel = mongoose.model<HotelType>("Hotel", hotelSchema);
+// const Booking = mongoose.model<BookingType>("Booking", bookingSchema);
 export default Hotel;
+// module.exports= {Hotel, Booking}

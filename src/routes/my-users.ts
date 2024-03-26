@@ -1,34 +1,48 @@
 import express, { Request, Response } from "express";
-import verifyToken from "../../middleware/auth";
-import UserType from "../models/user";
-import Hotel from "../models/hotel";
+import Hotel, { HotelType } from "../models/hotel";
 import User from "../models/user";
 
 const router = express.Router();
 
-// /api/users-with-bookings
-
-// Fetch users along with their bookings
-router.get("/", verifyToken, async (req: Request, res: Response) => {
+// Fetch all the users
+router.get("/getallusers", async (req, res) => {
   try {
-    // Find users with bookings associated with the authenticated user
-    const usersWithBookings = await Hotel.find({
-      bookings: { $exists: true, $ne: [] }, // Find users with at least one booking
-    }).populate("bookings"); // Populate the bookings field
+    const getallUsers = await User.find({ role: "user" });
 
-    // Send the users along with their populated bookings
-    res.status(200).json(usersWithBookings);
+    // console.log(getallUsers);
+
+    res.json(getallUsers);
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Unable to fetch users with bookings" });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// Fetch users with their associated hotels
-router.get("/", async (req, res) => {
+router.get("/hotelbyuserid/:userId", async (req, res) => {
   try {
-    const usersWithHotels = await User.find().populate("hotels");
-    res.json(usersWithHotels);
+    const userId = req.params.userId;
+    // Corrected: Access userId from params
+
+    const hotels = await Hotel.find({
+      bookings: { $elemMatch: { userId: req.params.userId } },
+    });
+
+    // Corrected: Find hotels with matching userId
+    const results = hotels.map((hotel) => {
+      const userBookings = hotel.bookings.filter(
+        (booking) => booking.userId === req.params.userId
+      );
+
+      // Create a new HotelType object with filtered user bookings
+      const hotelWithUserBookings: HotelType = {
+        ...hotel.toObject(),
+        bookings: userBookings,
+      };
+
+      return hotelWithUserBookings;
+    });
+
+    res.json(results);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
