@@ -4,6 +4,7 @@ import { BookingType, HotelSearchResponse } from "../../src/models/hotel";
 import { param, validationResult } from "express-validator";
 import Stripe from "stripe";
 import verifyToken from "../../middleware/auth";
+import Booking from "../models/booking";
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY as string);
 
@@ -164,19 +165,22 @@ router.post(
         userId: req.userId,
       };
 
-      const hotel = await Hotel.findOneAndUpdate(
-        { _id: req.params.hotelId },
-        {
-          $push: { bookings: newBooking },
+      try {
+        const hotel = await Hotel.findOneAndUpdate(
+          { _id: req.params.hotelId },
+          {
+            $push: { bookings: newBooking },
+          }
+        );
+
+        if (!hotel) {
+          return res.status(400).json({ message: "hotel not found" });
         }
-      );
-
-      if (!hotel) {
-        return res.status(400).json({ message: "hotel not found" });
+        await hotel.save();
+        res.status(200).send();
+      } catch (error) {
+        console.log("Booking Not done");
       }
-
-      await hotel.save();
-      res.status(200).send();
     } catch (error) {
       console.log(error);
       res.status(500).json({ message: "something went wrong" });
@@ -239,5 +243,33 @@ const constructSearchQuery = (queryParams: any) => {
 
   return constructedQuery;
 };
+
+// Update selected room for a hotel booking
+router.put(
+  "/bookings/:bookingId/room",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { bookingId } = req.params;
+      const { selectedRoom } = req.body;
+
+      // Update selected room for the booking
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        bookingId,
+        { selectedRoom },
+        { new: true }
+      );
+
+      if (!updatedBooking) {
+        return res.status(404).json({ message: "Booking not found" });
+      }
+
+      res.status(200).json(updatedBooking);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  }
+);
 
 export default router;

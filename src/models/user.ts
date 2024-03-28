@@ -12,7 +12,6 @@ export type UserType = {
   resetToken?: string;
   resetTokenExpiration?: number;
   role: "admin" | "user";
-
 };
 
 // Define the schema for the User model
@@ -24,7 +23,6 @@ const userSchema = new mongoose.Schema({
   resetToken: { type: String },
   resetTokenExpiration: { type: Number },
   role: { type: String, enum: ["admin", "user"], default: "user" },
-  
 });
 
 // Middleware to hash the password before saving it to the database

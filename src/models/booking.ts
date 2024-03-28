@@ -11,6 +11,7 @@ export type BookingType = {
     checkIn: Date;
     checkOut: Date;
     totalCost: number;
+    selectedRoom:string;
   };
 
   const bookingSchema = new mongoose.Schema<BookingType>({
@@ -23,6 +24,7 @@ export type BookingType = {
     checkOut: { type: Date, required: true },
     userId: { type: String, required: true },
     totalCost: { type: Number, required: true },
+    selectedRoom: { type: String, required: true },
   });
 
 

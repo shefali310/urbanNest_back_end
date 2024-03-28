@@ -9,7 +9,7 @@ router.get("/getallusers", async (req, res) => {
   try {
     const getallUsers = await User.find({ role: "user" });
 
-    // console.log(getallUsers);
+   
 
     res.json(getallUsers);
   } catch (error) {
